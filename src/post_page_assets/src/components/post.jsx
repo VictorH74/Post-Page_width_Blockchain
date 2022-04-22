@@ -3,6 +3,8 @@ import Comment from "./comment";
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import AddComment from "./AddComment";
 import { post_page } from "../../../declarations/post_page";
+import cryptoRandomString from 'crypto-random-string';
+
 
 export default function Post() {
     const [post, setPost] = useState({
@@ -15,6 +17,14 @@ export default function Post() {
     const [liked, setLiked] = useState(false);
     const [likesNumber, setLikes] = useState(post.likes ? likes : Math.floor(Math.random() * 50 * 10));
 
+    useEffect(() => {
+        fetchData();
+    }, [] );
+
+    async function fetchData(){
+        let commentsArray = await post_page.readComments();
+        setListComments(commentsArray);
+    }
 
     function randomNumber() {
         return Math.floor(Math.random() * 100 + 1);
@@ -30,18 +40,19 @@ export default function Post() {
     function newComment(fields) {
         if (fields.user.length > 0 && fields.content.length > 0) {
             let instant = new Date();
-
             let comment = {
+                id: cryptoRandomString({length: 10}),
                 user: fields.user,
                 content: fields.content,
                 moment: `${instant.getDate()}/${instant.getMonth()}/${instant.getFullYear()}`,
                 likes: 0,
                 isArtificial: false
             }
-
             setListComments(
                 prevComments => {
+
                     post_page.newComment(
+                        comment.id,
                         comment.user,
                         comment.content,
                         comment.moment,
@@ -55,25 +66,14 @@ export default function Post() {
         } else { alert("Preencha os campos para poder comentar"); }
     }
 
-    useEffect(() => {
-        fetchData();
-    }, [] );
-
-    async function fetchData(){
-        let commentsArray = await post_page.readComments();
-        setListComments(commentsArray);
-    }
-
     function deleteComment(id) {
-
-        post_page.deleteComment(id);
-
         setListComments(currentComments => {
-            return currentComments.filter((comment, index) => {
-                return index !== id;
+            return currentComments.filter((comment) => {
+                return comment.id !== id;
             });
         });
-        
+
+        post_page.deleteComment(id);
     }
 
     return (
@@ -103,18 +103,24 @@ export default function Post() {
             <AddComment clickFunction={newComment} />
 
             <div className="comments">
-                {listComments.map((comment, index) =>
-                    <Comment
-                        key={index}
-                        id={index}
-                        user={comment.user}
-                        moment={comment.moment}
-                        text={comment.content}
-                        likes={comment.likes || parseInt(comment.likes) === 0 ? parseInt(comment.likes) : randomNumber}
-                        isArtificial={comment.isArtificial}
-                        clickFunction={deleteComment}
-                    />
-                )}
+                {
+                    listComments.map((comment) =>
+                        <Comment
+                            key={comment.id}
+                            id={comment.id}
+                            user={comment.user}
+                            moment={comment.moment}
+                            text={comment.content}
+                            likes={
+                                comment.likes || parseInt(comment.likes) === 0 ? 
+                                parseInt(comment.likes) 
+                                : 
+                                randomNumber}
+                            isArtificial={comment.isArtificial}
+                            clickFunction={deleteComment}
+                        />
+                    )
+                }
             </div>
         </>
     );

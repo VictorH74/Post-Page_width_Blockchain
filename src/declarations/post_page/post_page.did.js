@@ -1,5 +1,6 @@
 export const idlFactory = ({ IDL }) => {
   const Comment = IDL.Record({
+    'id' : IDL.Text,
     'isArtificial' : IDL.Bool,
     'content' : IDL.Text,
     'user' : IDL.Text,
@@ -7,9 +8,9 @@ export const idlFactory = ({ IDL }) => {
     'moment' : IDL.Text,
   });
   return IDL.Service({
-    'deleteComment' : IDL.Func([IDL.Nat], [], ['oneway']),
+    'deleteComment' : IDL.Func([IDL.Text], [], ['oneway']),
     'newComment' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Bool],
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Bool],
         [],
         ['oneway'],
       ),

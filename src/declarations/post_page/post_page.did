@@ -1,13 +1,14 @@
 type Comment = 
  record {
    content: text;
+   id: text;
    isArtificial: bool;
    likes: nat;
    moment: text;
    user: text;
  };
 service : {
-  deleteComment: (nat) -> () oneway;
-  newComment: (text, text, text, nat, bool) -> () oneway;
+  deleteComment: (text) -> () oneway;
+  newComment: (text, text, text, text, nat, bool) -> () oneway;
   readComments: () -> (vec Comment) query;
 }

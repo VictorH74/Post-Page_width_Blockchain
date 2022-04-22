@@ -24,12 +24,12 @@ export default function Comment(props) {
     }
 
     function deleteComment(event) {
+        setIsMouseOver(false);
         event.target.parentNode.parentNode.parentNode.parentNode.style.animation = "takeOut 1s both ease-in-out";
 
         setTimeout(() => {
             props.clickFunction(props.id);
         }, 700);
-        setIsMouseOver(false);
     }
 
     return (
